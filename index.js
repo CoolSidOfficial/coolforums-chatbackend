@@ -10,22 +10,26 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*"
-  }
+    origin: "*",
+  },
 });
 
 io.on("connection", (socket) => {
-  console.log("User connected");
+  console.log("User connected:", socket.id);
 
-  socket.on("send-message", (msg) => {
-    io.emit("receive-message", msg);
+  // notify everyone
+  io.emit("user_joined", "A new user joined the chat");
+
+  socket.on("send_message", (messageData) => {
+    io.emit("receive_message", messageData);
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected");
+    io.emit("user_left", "A user left the chat");
+    console.log("User disconnected:", socket.id);
   });
 });
 
-server.listen(3001, () => {
-  console.log("Chat server running on port 3001");
+server.listen(5000, () => {
+  console.log("Socket server running on port 5000");
 });
